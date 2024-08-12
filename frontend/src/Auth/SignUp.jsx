@@ -42,10 +42,15 @@ const SignUp = () => {
       const data = await response.json();
 
       console.log(data);
-      if (data) {
+      if (response.status === 201 && data.token) {
+        // Store the token and user information in localStorage
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data));
-        toast.success("Sign up successful");
+
+        // Show success message
+        toast.success("Sign in successful");
+
+        // Redirect or update state as needed
         navigate("/");
       } else {
         toast.error(data.message || "Sign up failed");
