@@ -1,6 +1,5 @@
 const connection = require("../utils/db"); // Import the connection
 
-// Function to get banner
 // Function to create or update a banner
 const createOrUpdateBanner = async (req, res) => {
   const { id, description, link, isVisible, timer_start, timer_end } = req.body;
@@ -52,50 +51,42 @@ const createOrUpdateBanner = async (req, res) => {
   }
 
   try {
-    connection.query(query, values, (err) => {
-      if (err) {
-        return res
-          .status(500)
-          .json({ error: "Database query failed", details: err.message });
-      }
-      res.status(200).json({
-        message: id
-          ? "Banner updated successfully"
-          : "Banner created successfully",
-      });
+    await connection.query(query, values);
+    res.status(200).json({
+      message: id
+        ? "Banner updated successfully"
+        : "Banner created successfully",
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res
+      .status(500)
+      .json({ error: "Database query failed", details: err.message });
   }
 };
 
 // Function to get banner with time_remaining
 const getBanner = async (req, res) => {
   try {
-    const sql = "SELECT * FROM banners WHERE id=1";
-    connection.query(sql, (err, result) => {
-      if (err) {
-        return res
-          .status(500)
-          .json({ error: "Database query failed", details: err.message });
-      }
-      if (result.length === 0) {
-        return res.status(404).json({ message: "No Banners currently" });
-      }
+    const result = await connection.query("SELECT * FROM banners WHERE id=1");
 
-      // Calculate time remaining
-      const banner = result[0];
-      const now = new Date();
-      const endTime = new Date(banner.timer_end);
-      const timeRemaining = Math.max((endTime - now) / 1000, 0); // Remaining time in seconds
+    if (result.length === 0) {
+      return res.status(404).json({ message: "No Banners currently" });
+    }
 
-      res.json({
-        ...banner,
-        time_remaining: timeRemaining, // Add remaining time to response
-      });
+    // Calculate time remaining
+    const banner = result[0];
+    const now = new Date();
+    const endTime = new Date(banner.timer_end);
+    const timeRemaining = Math.max((endTime - now) / 1000, 0); // Remaining time in seconds
+
+    res.json({
+      ...banner,
+      time_remaining: timeRemaining, // Add remaining time to response
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res
+      .status(500)
+      .json({ error: "Database query failed", details: err.message });
   }
 };
 
