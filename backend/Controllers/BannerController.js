@@ -6,9 +6,9 @@ const createOrUpdateBanner = async (req, res) => {
   console.log(req.body);
 
   // Validate required fields
-  if (!description || !link || !isVisible || !timer_start || !timer_end) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
+  // if (!description || !link || !isVisible || !timer_start || !timer_end) {
+  //   return res.status(400).json({ error: "Missing required fields" });
+  // }
 
   // Calculate time_remaining
   const now = new Date();
